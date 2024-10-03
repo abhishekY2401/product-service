@@ -1,0 +1,40 @@
+type Product {
+    id: ID!
+    name: String!
+    description: String!
+    price: Float!
+    stock: Int!
+    sku: String!
+    category: String!
+}
+
+type ProductPrice {
+    id: ID!
+    price: Float!
+}
+
+type ProductResponse {
+    success: Boolean!
+    errors: String
+    product: Product
+}
+
+input CreateProductInput {
+    name: String!
+    description: String!
+    price: Float!
+    stock: Int!
+    sku: String!
+    category: String!
+}
+
+type Query {
+    products: [Product!]!
+    product(id: ID!): Product
+    productByIds(ids: [ID!]!): [ProductPrice!]!
+}
+
+type Mutation {
+    createProduct(input: CreateProductInput!): Product
+    updateProductInventory(product_id: ID!, stock_change: Int!): ProductResponse
+}
