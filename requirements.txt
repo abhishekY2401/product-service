@@ -1,0 +1,11 @@
+flask 
+flask-SQLAlchemy 
+flask-JWT-Extended 
+psycopg2-binary 
+flask-bcrypt
+python-dotenv
+Flask-Migrate
+prometheus-client
+ariadne
+requests
+pika
