@@ -78,13 +78,11 @@ def handle_create_product(_, info, input):
         event_data = json.dumps({
             "id": new_product.id,
             "name": new_product.name,
-            "description": new_product.description,
             "price": new_product.price,
-            "stock": new_product.stock,
-            "category": new_product.category,
-            "sku": new_product.sku
+            "quantity": new_product.stock,
         })
-        publish_event(Config.PRODUCT_CREATED_QUEUE, event_data)
+        publish_event(exchange_name="event_exchange",
+                      routing_key=Config.PRODUCT_CREATED_QUEUE, message=event_data)
 
         return new_product
 
