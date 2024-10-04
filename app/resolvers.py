@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime, timezone
 from ariadne import QueryType, MutationType
+from app.middleware import jwt_required
 from app.models import Product
 from config import Config
 from app.extensions import db, bcrypt
@@ -12,6 +13,7 @@ mutation = MutationType()
 
 
 @query.field("products")
+@jwt_required
 def fetch_products(*_):
     try:
         products = Product.query.all()
@@ -24,6 +26,7 @@ def fetch_products(*_):
 
 
 @query.field("product")
+@jwt_required
 def fetch_product(_, info, id):
     try:
         # product_id = info.context.get("product_id")
@@ -37,6 +40,7 @@ def fetch_product(_, info, id):
 
 
 @query.field("productByIds")
+@jwt_required
 def resolve_product_by_ids(_, info, ids):
     # fetch all the product prices based on the product ids
     products = Product.query.filter(Product.id.in_(ids)).all()
@@ -47,6 +51,7 @@ def resolve_product_by_ids(_, info, ids):
 
 
 @mutation.field("createProduct")
+@jwt_required
 def handle_create_product(_, info, input):
     name = input.get('name'),
     description = input.get('description'),
@@ -93,6 +98,7 @@ def handle_create_product(_, info, input):
 
 
 @mutation.field("updateProductInventory")
+@jwt_required
 def update_product_inventory(_, info, product_id, stock_change):
     try:
         logging.info(f"Attempting to find product with id: {product_id}")
