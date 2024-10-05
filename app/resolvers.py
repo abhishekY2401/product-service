@@ -17,10 +17,18 @@ mutation = MutationType()
 def fetch_products(*_):
     try:
         products = Product.query.all()
-        return products
-    except Exception as e:
-        logging.error(f"Error fetching products: {e}")
-        return []
+        return {
+            "success": True,
+            "message": "Product fetched successfully.",
+            "products": products
+        }
+    except Exception as error:
+        logging.error(f"Error fetching products: {error}")
+        return {
+            "success": False,
+            "message": str(error),
+            "orders": []
+        }
 
 # fetch a product by its id
 
@@ -32,11 +40,24 @@ def fetch_product(_, info, id):
         # product_id = info.context.get("product_id")
         product = Product.query.get(id)
         if not product:
-            raise Exception(f"Product with id {id} not found")
-        return product
-    except Exception as e:
-        logging.error(f"Error fetching product: {e}")
-        return None
+            return {
+                "success": False,
+                "message": f"Product with id {id} not found",
+                "orders": None
+            }
+
+        return {
+            "success": True,
+            "message": "Product fetched successfully.",
+            "products": [product]
+        }
+    except Exception as error:
+        logging.error(f"Error fetching product: {error}")
+        return {
+            "success": False,
+            "message": str(error),
+            "orders": []
+        }
 
 
 @query.field("productByIds")
@@ -64,11 +85,19 @@ def handle_create_product(_, info, input):
     category = input.get('category')
 
     if not name or not description or not price or not stock or not sku or not category:
-        raise Exception("Please enter all the product data")
+        return {
+            "success": False,
+            "message": "Please enter all the required product data",
+            "products": None
+        }
 
     try:
         if Product.query.filter_by(sku=sku).first():
-            raise Exception('Product with this sku number already exists!')
+            return {
+                "success": False,
+                "message": 'Product with this sku number already exists!',
+                "products": None
+            }
 
         new_product = Product(
             name=name,
@@ -92,12 +121,20 @@ def handle_create_product(_, info, input):
         publish_event(exchange_name="event_exchange",
                       routing_key=Config.PRODUCT_CREATED_QUEUE, message=event_data)
 
-        return new_product
+        return {
+            "success": True,
+            "message": 'Successfully created a new product',
+            "products": [new_product.to_dict()]
+        }
 
-    except Exception as e:
+    except Exception as error:
         db.session.rollback()
-        logging.error(f"Error while creating product: {e}")
-        raise Exception("Failed to create a product.")
+        logging.error(f"Error while creating product: {error}")
+        return {
+            "success": False,
+            "message": f"Failed to create a product {error}",
+            "orders": []
+        }
 
 
 @mutation.field("updateProductInventory")
@@ -109,7 +146,11 @@ def update_product_inventory(_, info, product_id, stock_change):
 
         if not product:
             logging.error(f"Product with id {product_id} not found")
-            raise Exception("Product not found")
+            return {
+                "success": False,
+                "message": f"Product with id {id} not found",
+                "orders": None
+            }
 
         logging.info(f"Found product: {product}")
 
@@ -117,7 +158,11 @@ def update_product_inventory(_, info, product_id, stock_change):
         if product.stock + stock_change < 0:
             logging.error(
                 f"Insufficient stock for product {product_id}. Current stock: {product.stock}, attempted change: {stock_change}")
-            raise Exception("Insufficient stock to complete the operation")
+            return {
+                "success": False,
+                "message": "Insufficient stock to complete the operation",
+                "orders": None
+            }
 
         # Update the stock
         product.stock += stock_change
@@ -147,7 +192,8 @@ def update_product_inventory(_, info, product_id, stock_change):
 
         payload = {
             "success": True,
-            "product": product.to_dict()
+            "message": "Successfully updated the inventory",
+            "products": [product.to_dict()]
         }
 
     except Exception as error:

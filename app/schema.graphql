@@ -1,40 +1,40 @@
 type Product {
-    id: ID!
-    name: String!
-    description: String!
-    price: Float!
-    stock: Int!
-    sku: String!
-    category: String!
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  stock: Int!
+  sku: String!
+  category: String!
 }
 
 type ProductPrice {
-    id: ID!
-    price: Float!
+  id: ID!
+  price: Float!
 }
 
 type ProductResponse {
-    success: Boolean!
-    errors: String
-    product: Product
+  success: Boolean!
+  message: String
+  products: [Product]
 }
 
 input CreateProductInput {
-    name: String!
-    description: String!
-    price: Float!
-    stock: Int!
-    sku: String!
-    category: String!
+  name: String!
+  description: String!
+  price: Float!
+  stock: Int!
+  sku: String!
+  category: String!
 }
 
 type Query {
-    products: [Product!]!
-    product(id: ID!): Product
-    productByIds(ids: [ID!]!): [ProductPrice!]!
+  products: ProductResponse!
+  product(id: ID!): ProductResponse!
+  productByIds(ids: [ID!]!): [ProductPrice!]!
 }
 
 type Mutation {
-    createProduct(input: CreateProductInput!): Product
-    updateProductInventory(product_id: ID!, stock_change: Int!): ProductResponse
+  createProduct(input: CreateProductInput!): ProductResponse!
+  updateProductInventory(product_id: ID!, stock_change: Int!): ProductResponse!
 }
