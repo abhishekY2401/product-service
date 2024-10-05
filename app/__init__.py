@@ -17,7 +17,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
 
     # Register GraphQL routes
-    app.add_url_rule('/graphql_playground',
+    app.add_url_rule('/graphql',
                      view_func=graphql_playground, methods=['GET'])
     app.add_url_rule('/graphql', view_func=graphql_server, methods=['POST'])
 
