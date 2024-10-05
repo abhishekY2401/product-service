@@ -45,6 +45,9 @@ def resolve_product_by_ids(_, info, ids):
     # fetch all the product prices based on the product ids
     products = Product.query.filter(Product.id.in_(ids)).all()
 
+    if not products:
+        return []
+
     return [product.to_dict() for product in products]
 
 # handle creation of product
