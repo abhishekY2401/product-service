@@ -5,11 +5,8 @@ load_dotenv()
 
 
 class Config:
-    DB_PASSWORD = os.environ['DB_PASSWORD']
     RABBITMQ_URL = os.environ['RABBITMQ_URI']
-    SQLALCHEMY_DATABASE_URI = (
-        f'postgresql://postgres:{DB_PASSWORD}@localhost:5432/products_db'
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.environ['JWT_SECRET_KEY']
     PRODUCT_CREATED_QUEUE = 'product.created'

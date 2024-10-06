@@ -1,14 +1,16 @@
-FROM python:3.8-slim
+FROM python:3.8-alpine
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apk add --no-cache gcc musl-dev linux-headers
+
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
 
-EXPOSE 7000
+# Copy the run.sh script into the container
+COPY run.sh .
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=7000"]
-
-
+# Set the command to run the script
+CMD ["sh", "run.sh"]
